@@ -1,2 +1,0 @@
-import(mvtnorm)
-export(obspower,obssensitivity,obssamplesize,obspowergraph)
