@@ -1,0 +1,280 @@
+\documentclass[12pt,letter]{article}
+\usepackage{graphicx,url,layout,pslatex,rplain}
+\usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
+
+\special{papersize=8.5in,11in}
+
+
+
+\title{Calculation of Power of Sensitivity Analyses for Observational Studies:}
+
+
+\begin{document}
+
+
+
+\maketitle
+\section{Significance}
+
+\subsection{Randomized Experiments}
+
+Education Researchers have been encouraged to use randomized controlled experiments (see, for example, Mosteller and Boruch(2002)). In such experiments two or more sets of conditions are randomly assigned to the participants in the study. Consider the case of an intervention (such as a early reading program) which will be given to some children and not to others based on random assignment.
+Because of the random assignment there is unlikely to be marked differences between the groups prior to the intervention and hence any differences after the intervention are likely to be causally linked to the intervention.
+
+
+
+\subsection{Power for a randomized experiment}
+
+The need for an adequate sample size in a designed experiment is very important. The sample size requirements depend on the variability, the level at which the statistical test is carried out, the size of the differences between the control and treatment groups that is considered practically important and the power required i.e. the likelihood of finding a practically important difference to be statistically significant (See, for example, Lenth (2001).
+Educational researchers have been recently  aided by the development of easily used software such as that of Spybook et.\ al.\ (2011) which allows researchers to determine appropriate sample sizes for both person randomized and cluster randomized trials.
+
+One of the simplest experimental designs is a matched pairs design comparing a control treatment to an experimental treatment. For each pair the experimental treatment is assigned to one member of the pair at random, while the other member of the pair gets the control treatment. Given this randomization, the experiment can be analyzed using the Wilcoxon signed rank test (see, for example, Lehman (1975)): the sum of positive signed ranks where the result for the experimental member is greater than the result for the control member.
+Under the null hypothesis this statistics has a mean of $N(N+1)/4$ and a variance of $(N(N+1)/(2N+1))/24$, where $N$ is the sample size, and is approximately normal. To demonstrate superiority of the treatment over the control at the $\alpha\%$ level, the critical value is given by \[\zeta_{\alpha}=\frac{N(N+1)}{4}+\Phi^{-1}\left(1-\alpha\right)\sqrt{\frac{N(N+1)(2N+1)}{24}}\]
+
+To determine the power of the test, and hence the required sample size, we assume, without loss of generality, that the distribution under the null hypothesis is normal N(0,1) and under the alternative hypothesis the distribution is normal N($\Delta$,1), i.e. the effect of the intervention is to increase the measurement (such as a test score) by $\Delta$ standard deviations. Following Lehman (1975) and Rosenbaum(2002, 2010) the expected value of the Wilcoxon signed rank statistic is \[\mu_T=\frac{N(N+1)p_1^{\prime}}{4}+Np\]
+where \[p=\Pr(Y>0)=1-\Phi(-\Delta)\] and \[p^{\prime}_1=\Pr(Y_i+Y_{i^{\prime}}>0)=1-\Phi(-\sqrt{2}\Delta),\]
+and the variance is
+\[\sigma^2_T=N(N-1)(N-2)(p_2^{\prime}-{p_1^{\prime}}^2)+\frac{N(N-1)}{2}\left\{2(p-p^{\prime}_1)^2+3p_1^{\prime}(1-p_1^{\prime})\right\}+Np(1-p)\]
+where \[p_2^{\prime}=\Pr(Y_i+Y_{i}^{\prime}>0 \mbox{ and } Y_i+Y_{i}^{\prime \prime}>0)\]
+with $i<i^{\prime}<i^{\prime \prime}$. Note while $p$ and $p_1^{\prime}$ are easily calculated using almost any statistical software, $p_2^{\prime}$ can be determined using numerical integration or simulation.
+
+The power of the test is \[1-\Phi\left(\frac{\zeta_{\alpha}-\mu_T}{\sigma_T}\right)\]
+and depends on $\Delta$ and the sample size and hence the sample size can be calculated given values
+ of $\Delta$ and $\alpha$.
+
+\begin{figure}[!t]
+\begin{center}
+<<echo=FALSE,fig=TRUE>>=
+require(ObsSensitivity)
+plot(seq(2,100),sapply(2:100,obspower),type="l",xlab="Number of Matched Pairs",
+     ylab="Power")
+abline(h=0.8,lty=2)
+abline(v=28,lty=2)
+@
+\end{center}
+\caption{Power for a matched pairs randomized trial, analyzed using the Wilcoxon signed rank statistic,
+ when the difference between the means of the treatment group and control group is expected
+  to be half a standard deviation. For 80\% power, 28 pairs would need to be used.}
+\end{figure}
+
+Figure 1, based on the R code that we have written, shows a plot of the power for a matched pairs design, analyzed using Wilcoxon's signed rank statistic, when the difference between the means of the treatment group and control group is expected to be half a standard deviation. It shows that for 80\% power, that 28 pairs would be required. If the desired difference is smaller a larger sample size would be required, as too would be the case if the required power was higher.
+
+\subsection{Observational Studies}
+
+In Cochran (1983, p.1),
+observational studies were defined as ``a class of studies, primarily in human populations, that have two characteristics:
+\begin{enumerate}
+\item The objective is to study the causal effects of certain agents, procedures, treatments, or programs.
+\item For one reason or another, the investigator cannot use controlled experimentation, that is, the investigator cannot impose on a subject, or withold from a subject, a procedure or treatment whose effects he desires to discover, or cannot assign subjects at random to different procedures."
+\end{enumerate}
+
+Despite the inferential advantages of randomized experiments, observational studies are still often used. The design of observational studies is just as important as in randomized controlled experiments and ``a well designed observational study resembles, as closely as possible, a simple randomized experiment \ldots [except that in an observational study] \ldots randomization is not used to assign treatments". (Rosenbaum, 2010, p.4).
+
+\subsubsection{Propensity Scores}
+
+In observational studies, which attempt to evaluate the effect of a program (treatment) on its participants, it is important to control for naturally occurring differences in the background characteristics of program participants and non-participants.  An ideal match would be two individuals, a program participant and non-participant, for whom all other variables that are predictive of participation in the program are the same. However, when a large number of variables are included, such a match is unlikely.  A more practical way to select a comparison group, given the existing data, is to use the propensity scoring technique (Rosenbaum and Rubin, 1983; see also Guo and Fraser, 2010). Many observational studies now use propensity scores to make the treatment and control groups comparable. Propensity scoring aims to find the closest (in terms of observable characteristics or covariates) comparison group from a sample of non-participants to the sample of program participants. Instead of ensuring that the matched non-participant for each participant has exactly the same value for each variable, the same result can be achieved by matching on one covariate, the predicted value of the propensity score.  Rosenbaum and Rubin (1983) showed that the method makes it possible to create a comparison group with characteristics that are similar to the participant group that would have been created had its members been selected randomly before the project.
+
+The propensity score is determined by conducting a logistic regression with the participation in the program as the binary dependent variable, and the observed covariates as the explanatory variables.
+
+
+
+
+\subsubsection{Bias due to unmeasured covariates}
+
+Although propensity scores remove the effect of measured covariates, they do not remove bias due to unmeasured variables and hence any differences between the treatment and control groups after the intervention may be due to hidden biases prior to the intervention. This is the major weakness of an observational study when compared to a randomized experiment. As Cochran says (Cochran, 1983, p.13)
+\begin{quote}
+``One consequence of this vulnerability to bias is that the results of observational studies are open to dispute".
+\end{quote}
+
+\subsection{Sensitivity of an observational study}
+
+An essential aspect of the analysis and reporting of an observational study is to carry out a sensitivity analysis which determines the magnitude of the bias that would be needed to alter the conclusions of the study. The bias is measured in terms of a parameter { $
+\Gamma$} (Gamma): the odds of receiving the treatment rather than the control given the observed covariates. A value of {$\Gamma=1$} indicates that there is no bias due to unmeasured covariates while a value of {$\Gamma=2$} indicates that an unobserved covariate has the effect of making one of two apparently equal subjects twice as likely to be in the treatment group than the control group.
+
+
+As an example, the conclusions of an observational study might be that there is a statistically significant difference between the treatment and control groups, as long as the value of {$\Gamma \le 3$}. When designing an observational study, a researcher needs to acknowledge both the requirement of testing the hypotheses of interest, but also assessing whether the differences found, if any, could be due to unmeasured biases. This second requirement can be done by specifying a maximum value of {$\Gamma$} that is thought possible. For instance, a maximum value of {$\Gamma=2.5$} would require a smaller sample size than {$\Gamma=3.5$}. Note that because of the need to conduct a sensitivity analysis, the sample size requirements of an observational study are likely to be larger than a randomized experiment, and this may help education researchers to realize the advantages of randomized experiments.
+
+
+\subsubsection{Power of a sensitivity analysis of a matched pairs design}
+
+Consider the matched pairs design considered earlier, but where the treatment and controls cannot be allocated randomly and are influenced by an unmeasured covariate. Instead of there being a 50\% chance of receiving the treatment, the chances will be uneven. We assume the odds of receiving the treatment for one of the pair range from $1/\Gamma$ to $\Gamma$, corresponding to probabilities of $1/(1+\Gamma)$ to $\Gamma/(1+\Gamma)$. $\Gamma=1$ corresponds to no bias while $\Gamma=2$ corresponds to a range of treatment allocation probabilities from 1/3 to 2/3. To undertake a sensitivity analysis a researcher is asking the question whether the differences between the treatment and control groups could be explained by differential treatment allocations and what values of $\Gamma$ would be required to explain the difference. Assuming a maximum value of $\Gamma$, what sample size would we need to explain the differences we have observed with a specified probability?
+
+It turns out that for the matched pairs design analyzed using a Wilcoxon signed rank statistic, under the null hypothesis the critical value becomes \[\zeta_{\alpha}=\frac{\Gamma}{1+\Gamma}\frac{N(N+1)}{4}+
+\Phi^{-1}\left(1-\alpha\right)
+\sqrt{\frac{\Gamma}{(1+\Gamma)^2}\frac{N(N+1)(2N+1)}{24}}\]
+
+Based on this, and using the R code provided in Appendix A, Figure 2 shows the power when testing at the 5\% of significance for various sample sizes and various values of $\Gamma$. This figure  reproduces Fig. 14.2 in Rosenbaum (2010, p. 268).
+
+\begin{figure}
+\begin{center}
+<<echo=FALSE,fig=T>>=
+obspowergraph(seq(1,3.5,0.5),2:100,0.5)
+@
+
+\end{center}
+\caption{Power for an observational trial when testing at the 5\% level of significance and the expected difference between the control and the treatment is 0.5 standard deviations. If $\Gamma=1$, then 28 matched pairs are required for 80\% power. On the other hand, if $\Gamma=1.5$, then 70 pairs are required for 80\% power.}
+\end{figure}
+
+
+Note that Figure 2 has a  number of interesting features which impact on the planning of an observational study:
+
+\begin{itemize}
+
+\item The power for values of $\Gamma$ greater than one is always less than for a randomized trial, corresponding to $\Gamma=1$, implying that the sample size for an observational study always needs to be greater than for a randomized experiment.
+\item There is a value of $\Gamma$ above which the power goes down irrespective of the number of pairs. When $\Delta=0.5$ the value of $\Gamma=3.171$. This is called the \emph{Design Sensitivity}.
+\item For values below the Design Sensitivity the power will increase as the number of pairs increase. However the power may still be quite low even if the maximum value of $\Gamma$ is less than the Design Sensitivity.
+\item The required sample size for say 80\% power depends on the maximum value of $\Gamma$ that can be considered possible. For example, the table below gives the sample size, in terms of the number of pairs, for various values of $\Gamma$.
+    \begin{center}
+    \begin{tabular}{c|r}
+    $\Gamma_{\mbox{max}}$ & \mbox{Number of pairs} \\ \hline
+    1 & 28 \\
+    1.5 & 70 \\
+    2 & 194 \\
+    2.5 & 752 \\ \hline
+    \end{tabular}
+    \end{center}
+
+\end{itemize}
+
+To illustrate, consider three educational researchers. All aim to compare a new educational treatment to the standard treatment. They all think that the new treatment will give results about half a standard deviation greater than the old treatment.
+
+\begin{itemize}
+\item Researcher A is going to use a randomized control trial. For 80\% power, she will need 28 pairs of classes, one of which the new treatment will be applied and one of which the standard treatment will be used, the decision based on random assignment. Since she has used a randomized trial, the results should not be subject to criticism that the initial groups were different to start with.
+
+\item Researcher B is going to use an observational study on classes that have used the standard treatment and the new treatment. He is careful to form pairs of schools that seem similar on observed covariates, maybe using modern methods like propensity scores to do this. He uses the same sample size as for a randomized trial. However, critics might object that that there are unobserved biases between schools receiving the new treatment and those receiving the old treatment. Even if the critics think these biases might only be moderate and perhaps the maximum value of $\Gamma$ would be 1.5, corresponding to probabilities of 0.6 and 0.4 rather than 0.5 and 0.5, the study is severely compromised. In fact the power of the study is reduced to 0.416, and hence there is a large chance that the study will be inconclusive, even if the new treatment is effective.
+
+\item Researcher C is going to conduct a similar study to Researcher B. She realizes that her study will be subject to more scrutiny than in a randomized trial, and based on this she needs to have a larger sample size than Researchers A and B to have 80\% power, in fact at least 70 pairs. If her budget is sufficient then the results of her study are not compromised as long as the bias is less than 1.5. On the other hand, if the budget does not allow for 70 pairs to be used, she will need to redesign the study by reducing the variability (see, for example Rosenbaum, 2005).
+\end{itemize}
+
+\subsubsection{Simulation and Closed Form Formulae}
+
+As outlined by Rosenbaum (2010), there are two steps in computing the power of a sensitivity analysis.
+\begin{description}
+\item[Step 1] Determining the critical value of the test statistic distribution assuming the null hypothesis is true but there is hidden bias.
+
+\begin{figure}[!t]
+\begin{center}
+\includegraphics[width=10cm]{Rplot05}
+\end{center}
+\caption{Null distribution of the Wilcoxon signed rank statistic with 28 matched pairs with no hidden bias ($\Gamma=1$) and with mild hidden bias ($\Gamma=1.5$). With hidden bias the null distribution is shifted to the right and the critical value, corresponding to the 95th percentile, is larger than without hidden bias.}
+\end{figure}
+
+\item[Step 2] Determining the probability of the test statistic exceeding the critical value found in Step~1, assuming the alternative hypothesis is true.
+\end{description}
+
+In some cases, such as the Wilcoxon signed rank statistic, both steps 1 and 2 have closed form formulae. For example, assume that the difference expected under the alternative hypothesis is $\Delta=0.5$. Figure~1 shows that 28 matched pairs would be required for 80\% power. However, if mild bias due to an unmeasured covariate corresponding to $\Gamma=1.5$ is possible, then the power would be reduced to 0.416. We could approximate this figure by simulation. Figure~3 shows the simulated  distribution (N=100,000 simulations) under the null hypothesis with no hidden bias and with hidden bias corresponding to $\Gamma=1.5$, i.e. probabilities of 0.4 and 0.6 rather than 0.5 and 0.5. The observed 95th percentile of the null distribution with hidden bias is 314. Figure~4 shows the simulated alternative distribution with $\Delta=0.5$, again with N=100,000 simulations. The simulated power of 0.44 approximates the theoretical power of 0.416 and the agreement will improve as the number of simulations increases.
+
+In other cases, there are no closed form formulae for steps 1 and/or 2. For example, it is much more common to analyze a paired sample observational study or randomized experiment using a paired t-test rather than a Wilcoxon signed-rank statistic. Although step 2 can be handled using formulae for the non-central $t$-distribution, simulation is required for step 1. In other cases, simulation will be required for both steps 1 and 2.
+
+Both these simulation steps are straightforward. To approximate the power for a paired sample design with $N$ pairs the following procedure is undertaken: For step 1, $N$ pairs of observations from identical distributions are generated, and the larger observation of the pair is assigned to the treatment group with probability $\Gamma/(1+\Gamma)$, with the other observation assigned to the control group. The test statistic is then calculated. The process is repeated a large number of times and the critical value is approximated by the appropriate percentile e.g. the 95th percentile when testing at the 5\% level. For step 2, $N$ pairs of observations are again generated, but with the observations from the treatment group shifted by $\Delta$ standard deviations. The test statistic is then calculated. Again the process is repeated a large number of times and the power is approximated by the proportion of test statistics greater than the approximated critical value from step 1.
+
+As the number of simulations increases it can be shown that the approximate power approaches the theoretical power, so using simulation is a method that can be used in cases where there are no closed form formulae. When closed form formulae are available, it is better to use them, both for accuracy and speed.
+
+\begin{figure}[!t]
+\begin{center}
+\includegraphics[width=10cm]{Rplot06}
+\end{center}
+\caption{Null distribution of the Wilcoxon signed rank statistic with 28 matched pairs with mild hidden bias ($\Gamma=1.5$) and alternative distribution assuming a treatment effect of 0.5 standard deviations. The power is the probability of the Wilcoxon signed rank statistic exceeding the critical value and is reduced to 0.44, lower than the power of 0.8 for a randomized study.}
+\end{figure}
+
+
+\subsubsection{The need for tools}
+
+Despite the necessity to undertake a sensitivity analysis after an observational study, there are very few examples where this has been done in the literature in an educational context. Indeed, most of the examples in the two books on Observational studies by Rosenbaum (2002, 2010) give medical and environmental examples. An educator who wants to plan and conduct a sensitivity analysis has few examples to imitate.
+
+Three important books on the conduct of Quasi-Experiments in Field Settings have been written that have a profound effect on the conduct of observational studies. The first two are Campbell, D.T. and Stanley, J.C. (1963) and Cook and Campbell, D.T. (1979), which pre-date Rosenbaum and other authors' work on sensitivity analyses.  The third book, Shadish, W.R., Cook, T.D. and Campbell, D.T. (2002), is viewed by the authors as a successor to Cook and Campbell (1979). In Appendix 5.1 of Shadish et.al. (2002), entitled \emph{Important Developments in Analyzing Data from Designs with Nonequivalent groups}, both propensity scores and hidden bias and sensitivity analysis are discussed. The authors ``hope they [sensitivity analysis and propensity scores] are used more widely to help us gain more practical experience about their feasibility and accuracy". They argue that sensitivity analyses are crucial in non-randomized experiments.
+
+Apart from the lack of examples, there are other barriers before sensitivity analyses become standard when educational researchers analyze observational studies. Many observational studies are not matched pairs studies, yet these are most emphasized in the books by Rosenbaum (2002, 2010) since, with matched pairs, the formulae for sensitivity analyses have closed form solutions. Educational researchers need tools which cover matched pairs, but also for comparing two unmatched groups.
+Similarly, educational researchers may be uncertain what should be done when propensity scores are used, or when there are two different control groups.
+
+The aim of the project is to develop
+\begin{itemize}
+\item A software tool that will assist researchers to design observational studies taking in the requirements that a sensitivity analysis needs to be done. The software tool will be provided using the R Commander interface to R, giving the advantages of R but with a convenient and easily learnt environment.
+\item Documentation of the use of the software with examples.
+\item Articles in educational journals and international conferences clarifying the role of sensitivity analyses in the design and analysis of observational studies.
+\end{itemize}
+
+\subsection{Requirements of the tools}
+
+
+Increasingly, R (R Development Core Team, 2011) has become the statistical package of choice. R is an open-source package that began as a teaching tool in 1996. Over time the base package now includes many statistical and graphical methods. One of the strong points in R is that it is extendable: users can contribute packages that others can use. Currently there are over 3000 packages. These packages are generally of very high quality and include the latest statistical advances. It is our intention to develop an R package early in the study. By getting the package into the R community, suggestions for improvement will likely be made and this will have the effect of enhancing the value of the project.
+
+We have already developed a prototype R package \texttt{ObsSensitivity} and made it available on R-Forge (\url{http://r-forge.com/ObsSensitivity}). The package consists of a number of useful functions, including:
+\begin{description}
+\item[obspower] Computes the power of a paired sample observational study to be analyzed by Wilcoxon's signed rank statistic.
+\item[obssensitivity] Computes the design sensitivity of a paired observational study.
+\item[obssamplesize] Computes the sample size of a paired observational study.
+\item[obspowergraph] Displays the power as a function of the number of pairs for various values of $\Gamma$.
+\end{description}
+
+The base R package is command based and hence some educators may be reluctant to use it. This can be overcome with the \texttt{Rcmdr} (R Commander) package (Fox, 2011) which is a menu interface to R. \texttt{Rcmdr} allows the user to input data of various types, get descriptive statistics, fit various models and produce different types of plots. It also has a plugin facility so that all statistical procedure coded in R can be made available via a clickable graphical user interface. A number of R Commander plugins are now available: experimental design, survival analysis, teaching demonstrations, and so on. Our intention is to develop a sensitivity analysis plugin package right from the beginning of the project, and to improve the plugin package and the user interface as the project proceeds.
+
+
+One advantage of using R is that there will be better integration with the other aspects of the observational study. First, R has many facilities to aid in the development of matched groups that researchers would need in the planning of an observational study, for example \texttt{cem}, \texttt{Matching}, \texttt{MatchIt}, \texttt{optmatch}, \texttt{PSAgraphics}, and \texttt{twang}.  Secondly, once the data are collected, R can be used to do the statistical analysis and prepare graphs and tables. Of special note is \texttt{rbounds}, which is an R package to actually conduct the sensitivity analysis with matched data, nicely complementing our package which is focussed on planning a sensitivity analysis.
+
+Since there will not be closed form formulae for the power of a sensitivity analysis in many cases, simulation will need to be used. This is particularly convenient in R. We will also use more efficient simulation methods, such as importance sampling (see, for example, Efron and Tibshurani, 1994), in order to decrease the variance of the estimated power and hence reduce the number of simulations required.
+
+
+\begin{thebibliography}{99}
+\bibitem{CS63} Campbell, D.T. and Stanley, J.C. (1963). \emph{``Experimental and Quasi-experimental designs for research"}, Chicago:RandMcNally.
+
+\bibitem{C83} Cochran, W. G. (1983). \emph{Planning and Analysis of Ovservational Studies,} Wiley: New York.
+
+
+
+
+\bibitem{CC79} Cook, T.D. and Campbell, D.T. (1979). \emph{``Quasi-Experimentation: Design and Analysis Issues for field settings.} Chicago: RandMcNally.
+
+\bibitem{E94} Efron, B. and Tibshirani, R.J. (1994). \emph{An introduction to the Bootstrap.} Chapman and Hall/CRC: Boca Ratan, FL.
+
+ \bibitem{F10} Fox, J. (2011). \emph{Rcmdr: R Commander. A platform-independent basic statistics GUI (graphical user interface) for R, based on the tcltk package.} \url{http://www.r-project.org}, \url{http://socserv.socsci.mcmaster.ca/jfox/Misc/Rcmdr/.}
+     
+ 
+
+\bibitem{GF09} Guo, S. and Fraser, W.M. (2009). \emph{Propensity Score Analysis: Statistical Methods and Applications.} Sage Publications, Thousand Oaks, CA.
+
+ \bibitem{L75} Lehman, E.L. (1975). \emph{Nonparametrics}, San Francisco: Holden Day. Reprinted New York: Springer (2006).
+ 
+ \bibitem{Liu, J.S. (2001). \emph{Monte Carlo Strategies in Scientific Computing.} Springer: New York.
+
+\bibitem{L01} Lenth, R.V. (2001). ``Some practical guidelines for effective sample size determination," \emph{The American Statistician} {\bf 55}, 187-193.
+
+\bibitem{M90} Manski, C.F. (1990). ``Nonparametric bounds on treatment effects," \emph{American Economic Review Papers and Proceedings} {\bf 80}, 319-323.
+
+\bibitem{MB02} Mosteller, F.\ and  and Boruch, R., (Eds.), (2002). \textit{Evidence Matters: Randomized Trials in Education Research}, Brookings Institution Press: Washington, DC.
+
+\bibitem{R10} R Development Core Team. (2011). \emph{R: A Language and Environment for Statistical Computing.} R Foundation for Statistical Computing, Vienna, Austria. ISBN 3-9000051-07-0.
+
+\bibitem{R95} Rosenbaum, P.R. (1995) ``Quantiles in nonrandom samples and observational studies," \emph{Journal of the American Statistical Association} {\bf 88}, 1250-1253.
+
+\bibitem{R02} Rosenbaum, P.R. (2002). \textit{Observational Studies.} 2nd. Edition. Springer: New York.
+
+\bibitem{R10} Rosenbaum, P.R. (2010). \textit{Design of Observational Studies.} Springer: New York.
+
+
+
+\bibitem{RR83} Rosenbaum, P.R and Rubin, D.B. (1983). ``The central role of the propensity score in observational studies for causal effects," \emph{Biometrika} {\bf 70}, 41-55.
+
+
+\bibitem{SCC02} Shadish, W.R., Cook, T.D. and Campbell, D.T. (2002). \emph{Experimental and Quasi-Experimental Designs for Generalized Causal Inference}.
+
+
+
+
+
+\bibitem{SRCM09}
+
+Spybook, J., Raudenbush, S.W., Congdon, R., and Mart\'{i}nez, A. (2011). Optimal Design for Longitudinal and Multilevel Research: Documentation of the ``Optimal Design" Software. \\ \url{http://www.wtgrantfoundation.org/resources/overview/research_tools}\\ Downloaded 1 September, 2011.
+
+\bibitem{TSa} TechSmith Corporation. (1995-2011a). ``Snagit screen capture software",
+    \url{www.techsmith.com/screen-capture.asp}
+
+
+\bibitem{TS}TechSmith Corporation. (1995-2011b). ``Camtasia Studio screen recorder and editor for Windows",
+    \url{www.techsmith.com/camtasia.asp}
+
+
+
+    \end{thebibliography}
+\end{document} 
+
